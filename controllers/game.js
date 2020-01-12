@@ -1,13 +1,15 @@
-exports.getGames = (req, res) => {
+const Game = require('../models/game');
+
+exports.getGames = async (req, res) => {
+	const games = await Game.find();
+
 	res.json({
 		status: 200,
-		data: {
-			message: 'test get games',
-		},
+		data: games,
 	});
 };
 
-exports.startGame = (req, res) => {
+exports.startGame = async (req, res) => {
 	res.json({
 		status: 200,
 		data: {

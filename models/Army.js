@@ -14,6 +14,7 @@ const armySchema = new Schema({
 	attackStrategy: {
 		type: String,
 		required: true,
+		enum: ['random', 'weakest', 'strongest'],
 	},
 	isUnderAttack: {
 		type: Boolean,

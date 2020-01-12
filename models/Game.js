@@ -6,6 +6,7 @@ const gameSchema = new Schema({
 	status: {
 		type: String,
 		required: true,
+		default: 'open',
 		enum: ['open', 'inProgress', 'close'],
 	},
 	armies: [
