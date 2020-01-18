@@ -1,4 +1,5 @@
 const Game = require('../models/game');
+const BattleSimulator = require('../services/battleSimulator');
 
 exports.getGames = async (req, res) => {
 	const games = await Game.find();
@@ -10,10 +11,28 @@ exports.getGames = async (req, res) => {
 };
 
 exports.startGame = async (req, res) => {
+	const openGame = await Game.findOne()
+		// .where('status').equals('open')
+		.populate('armies');
+
+	// if (!openGame) {
+	// 	return res.json({
+	// 		status: 400,
+	// 		data: {
+	// 			message: 'There is no open game at the moment.',
+	// 		},
+	// 	});
+	// }
+	BattleSimulator.startGame(openGame);
+
+	openGame.status = 'inProgress';
+	await openGame.save();
+
 	res.json({
 		status: 200,
 		data: {
-			message: 'test start game',
+			message: 'game started',
+			data: openGame,
 		},
 	});
 };
@@ -30,14 +49,18 @@ exports.getGameInfo = (req, res) => {
 	});
 };
 
-exports.resetGame = (req, res) => {
+exports.resetGame = async (req, res) => {
 	const { gameId } = req.body;
+
+	const game = await Game.findById(gameId).populate('armies');
+
+	BattleSimulator.resetGame(game);
 
 	res.json({
 		status: 200,
 		data: {
 			message: 'test reset game',
-			data: { gameId },
+			data: { game },
 		},
 	});
 };
