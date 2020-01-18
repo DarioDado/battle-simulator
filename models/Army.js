@@ -16,10 +16,6 @@ const armySchema = new Schema({
 		required: true,
 		enum: ['random', 'weakest', 'strongest'],
 	},
-	isUnderAttack: {
-		type: Boolean,
-		default: false,
-	},
 });
 
 module.exports = mongoose.model('Army', armySchema);

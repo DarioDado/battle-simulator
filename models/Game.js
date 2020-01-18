@@ -15,9 +15,6 @@ const gameSchema = new Schema({
 			ref: 'Army',
 		},
 	],
-	logFileName: {
-		type: String,
-	},
 	winner: {
 		type: Schema.Types.ObjectId,
 		ref: 'Army',

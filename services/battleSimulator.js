@@ -1,5 +1,6 @@
 const events = require('events');
 const Log = require('../models/log');
+const Game = require('../models/game');
 
 const eventEmitter = new events.EventEmitter();
 
@@ -37,6 +38,27 @@ class BattleSimulator {
 		});
 		log.save();
 		this.startGame(game);
+	}
+
+	static async finishInterruptedBattle() {
+		const interruptedGame = await Game.findOne()
+			.where('status').equals('inProgress')
+			.populate('armies');
+		if (interruptedGame) {
+			const gameLogs = await Log.find()
+				.where('game').equals(interruptedGame.id)
+				.where('type').equals('attack')
+				.sort({ timestamp: 1 });
+
+			gameLogs.forEach((log) => {
+				const attackedArmyIndex = interruptedGame.armies.findIndex((army) => army.id === log.data.underAttackArmyId);
+				interruptedGame.armies[attackedArmyIndex].units -= log.data.damage;
+			});
+
+			this.startGame(interruptedGame);
+		} else {
+			console.log('There is no interrupted games.');
+		}
 	}
 }
 
