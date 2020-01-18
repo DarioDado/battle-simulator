@@ -14,8 +14,12 @@ exports.addArmy = async (req, res) => {
 	openGame.armies.push(createdArmy);
 	await openGame.save();
 
-	res.json({
-		status: 200,
-		data: { army: createdArmy },
+
+	res.status(200).json({
+		data: {
+			message: 'Army has been successfully created',
+			army: createdArmy,
+			game: openGame,
+		},
 	});
 };

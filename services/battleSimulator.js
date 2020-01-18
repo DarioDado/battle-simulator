@@ -107,7 +107,7 @@ function attack(invadingArmy, game) {
 	} else {
 		game.armies.forEach((army) => {
 			eventEmitter.removeListener(`armyAttacked_${army.id}_${game.startedAt}`, attackArmyListener);
-			// army.save();
+			army.save();
 		});
 		game.winner = game.armies.find((army) => army.units > 0);
 		game.status = 'close';
