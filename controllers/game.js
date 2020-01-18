@@ -1,4 +1,5 @@
 const Game = require('../models/game');
+const Log = require('../models/log');
 const BattleSimulator = require('../services/battleSimulator');
 
 exports.getGames = async (req, res) => {
@@ -12,7 +13,7 @@ exports.getGames = async (req, res) => {
 
 exports.startGame = async (req, res) => {
 	const openGame = await Game.findOne()
-		// .where('status').equals('open')
+		.where('status').equals('open')
 		.populate('armies');
 
 	// if (!openGame) {
@@ -35,14 +36,20 @@ exports.startGame = async (req, res) => {
 	});
 };
 
-exports.getGameInfo = (req, res) => {
+exports.getGameInfo = async (req, res) => {
 	const { gameId } = req.params;
+
+	const game = await Game.findById(gameId);
+
+	const gameLogs = await Log.find()
+		.where('game').equals(game.id)
+		.sort({ timestamp: 1 });
 
 	res.json({
 		status: 200,
 		data: {
 			message: 'test get game info',
-			data: { gameId },
+			data: { game, gameLogs },
 		},
 	});
 };
