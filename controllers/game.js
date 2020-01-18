@@ -23,10 +23,8 @@ exports.startGame = async (req, res) => {
 	// 		},
 	// 	});
 	// }
-	BattleSimulator.startGame(openGame);
 
-	openGame.status = 'inProgress';
-	await openGame.save();
+	BattleSimulator.startGame(openGame);
 
 	res.json({
 		status: 200,

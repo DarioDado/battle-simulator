@@ -22,6 +22,9 @@ const gameSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Army',
 	},
+	startedAt: {
+		type: Number,
+	},
 });
 
 module.exports = mongoose.model('Game', gameSchema);
