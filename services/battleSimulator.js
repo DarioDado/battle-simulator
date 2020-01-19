@@ -1,6 +1,7 @@
 const events = require('events');
 const Log = require('../models/log');
 const Game = require('../models/game');
+const config = require('../config');
 
 const eventEmitter = new events.EventEmitter();
 
@@ -99,7 +100,7 @@ function startGameListener(armyListener, game) {
 function attackArmyListener(underAttackArmy, invadingArmy, game) {
 	if (isAttackSuccessful(invadingArmy.units)) {
 		if (underAttackArmy.units > 0 && invadingArmy.units > 0) {
-			let damage = Math.floor(invadingArmy.units * 0.5);
+			let damage = Math.floor(invadingArmy.units * config.battleSimulator.damagePerUnit);
 			damage = (damage > underAttackArmy.units) ? underAttackArmy.units : damage;
 			underAttackArmy.units -= damage;
 			console.log('invadingArmy', invadingArmy.name, 'underAttackArmy', underAttackArmy.name, 'units', underAttackArmy.units);
@@ -136,7 +137,7 @@ function attack(invadingArmy, game) {
 	if (fileredArmies.length > 0) {
 		if (invadingArmy.units > 0) {
 			const underAttackArmy = selectArmyToAttack(game, invadingArmy, fileredArmies);
-			const reloadTime = 10 * invadingArmy.units;
+			const reloadTime = config.battleSimulator.reloadTimePerUnit * invadingArmy.units;
 			setTimeout(() => {
 				eventEmitter.emit(`armyAttacked_${underAttackArmy.id}_${game.startedAt}`, underAttackArmy, invadingArmy, game);
 				attack(invadingArmy, game);

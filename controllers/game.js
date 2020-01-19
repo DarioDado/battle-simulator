@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Game = require('../models/game');
 const Log = require('../models/log');
 const BattleSimulator = require('../services/battleSimulator');
+const config = require('../config');
 
 /**
  * Fetch all games
@@ -41,7 +42,7 @@ exports.startGame = async (req, res) => {
 		});
 	}
 
-	if (openGame.armies.length < 10) {
+	if (openGame.armies.length < config.battleSimulator.minArmiesPerGame) {
 		return res.status(400).json({
 			data: {
 				message: 'At least 10 armies are required.',

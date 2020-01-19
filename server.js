@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const armyRoutes = require('./routes/army');
 const gameRoutes = require('./routes/game');
-
+const config = require('./config');
 const BattleSimulator = require('./services/battleSimulator');
 
 const app = express();
@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use(armyRoutes);
 app.use(gameRoutes);
 
-mongoose.connect('mongodb+srv://user1:battlesimulator123@cluster0-jxozd.mongodb.net/battle-simulator?retryWrites=true&w=majority')
+mongoose.connect(config.db.connectionString)
 	.then(() => {
 		console.log('Connected!');
 		BattleSimulator.finishInterruptedBattle();
