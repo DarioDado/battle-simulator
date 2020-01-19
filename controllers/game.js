@@ -3,6 +3,7 @@ const Game = require('../models/game');
 const Log = require('../models/log');
 const BattleSimulator = require('../services/battleSimulator');
 const config = require('../config');
+const LoggingService = require('../services/loggingService');
 
 /**
  * Fetch all games
@@ -89,9 +90,7 @@ exports.getGameInfo = async (req, res) => {
 		});
 	}
 
-	const gameLogs = await Log.find()
-		.where('game').equals(game.id)
-		.sort({ timestamp: 1 });
+	const gameLogs = await LoggingService.getLogsByGameId(game.id);
 
 	res.status(200).json({
 		data: {

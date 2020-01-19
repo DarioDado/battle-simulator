@@ -1,7 +1,7 @@
 const events = require('events');
-const Log = require('../models/log');
 const Game = require('../models/game');
 const config = require('../config');
+const LoggingService = require('./loggingService');
 
 const eventEmitter = new events.EventEmitter();
 
@@ -24,12 +24,7 @@ class BattleSimulator {
 
 		eventEmitter.emit(`gameStarted_${game.id}`, game);
 
-		const log = new Log({
-			type: 'startGame',
-			timestamp: Date.now(),
-			game,
-		});
-		log.save();
+		LoggingService.log('startGame', Date.now(), game, null);
 	}
 
 	/**
@@ -43,12 +38,9 @@ class BattleSimulator {
 			eventEmitter.removeAllListeners(`armyAttacked_${army.id}_${game.startedAt}`);
 		});
 		console.log('reset');
-		const log = new Log({
-			type: 'resetGame',
-			timestamp: Date.now(),
-			game,
-		});
-		log.save();
+
+		LoggingService.log('resetGame', Date.now(), game, null);
+
 		this.startGame(game);
 	}
 
@@ -62,10 +54,7 @@ class BattleSimulator {
 			.where('status').equals('inProgress')
 			.populate('armies');
 		if (interruptedGame) {
-			const gameLogs = await Log.find()
-				.where('game').equals(interruptedGame.id)
-				.where('type').equals('attack')
-				.sort({ timestamp: 1 });
+			const gameLogs = await LoggingService.getLogsByGameIdAndType(interruptedGame.id, 'attack');
 
 			gameLogs.forEach((log) => {
 				const attackedArmyIndex = interruptedGame.armies.findIndex((army) => army.id === log.data.underAttackArmyId);
@@ -104,19 +93,15 @@ function attackArmyListener(underAttackArmy, invadingArmy, game) {
 			damage = (damage > underAttackArmy.units) ? underAttackArmy.units : damage;
 			underAttackArmy.units -= damage;
 			console.log('invadingArmy', invadingArmy.name, 'underAttackArmy', underAttackArmy.name, 'units', underAttackArmy.units);
-			const log = new Log({
-				type: 'attack',
-				timestamp: Date.now(),
-				game,
-				data: {
-					invadingArmyId: invadingArmy.id,
-					invadingArmyName: invadingArmy.name,
-					underAttackArmyId: underAttackArmy.id,
-					underAttackArmyName: underAttackArmy.name,
-					damage,
-				},
-			});
-			log.save();
+
+			const logData = {
+				invadingArmyId: invadingArmy.id,
+				invadingArmyName: invadingArmy.name,
+				underAttackArmyId: underAttackArmy.id,
+				underAttackArmyName: underAttackArmy.name,
+				damage,
+			};
+			LoggingService.log('attack', Date.now(), game, logData);
 		}
 	} else {
 		console.log('invadingArmy', invadingArmy.name, 'unsuccessful attack');
@@ -151,17 +136,14 @@ function attack(invadingArmy, game) {
 		game.winner = game.armies.find((army) => army.units > 0);
 		game.status = 'close';
 		game.save();
-		const log = new Log({
-			type: 'endGame',
-			timestamp: Date.now(),
-			game,
-			data: {
-				winnerArmyId: game.winner.id,
-				winnerArmyName: game.winner.name,
-			},
-		});
-		log.save();
-		console.log(game);
+
+		const logData = {
+			winnerArmyId: game.winner.id,
+			winnerArmyName: game.winner.name,
+		};
+		LoggingService.log('endGame', Date.now(), game, logData);
+
+		console.log('End game');
 	}
 }
 
