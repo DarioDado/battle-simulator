@@ -3,6 +3,13 @@ const Game = require('../models/game');
 const Log = require('../models/log');
 const BattleSimulator = require('../services/battleSimulator');
 
+/**
+ * Fetch all games
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @return {void}
+ */
 exports.getGames = async (req, res) => {
 	const games = await Game.find();
 
@@ -14,6 +21,13 @@ exports.getGames = async (req, res) => {
 	});
 };
 
+/**
+ * Start battle if there is open game and enaugh armies
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @returns {void}
+ */
 exports.startGame = async (req, res) => {
 	const openGame = await Game.findOne()
 		.where('status').equals('open')
@@ -23,6 +37,14 @@ exports.startGame = async (req, res) => {
 		return res.status(400).json({
 			data: {
 				message: 'There is no open game at the moment.',
+			},
+		});
+	}
+
+	if (openGame.armies.length < 10) {
+		return res.status(400).json({
+			data: {
+				message: 'At least 10 armies are required.',
 			},
 		});
 	}
@@ -37,6 +59,14 @@ exports.startGame = async (req, res) => {
 	});
 };
 
+
+/**
+ * Fetch game info data and logs
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @returns {void}
+ */
 exports.getGameInfo = async (req, res) => {
 	const { gameId } = req.params;
 
@@ -71,6 +101,13 @@ exports.getGameInfo = async (req, res) => {
 	});
 };
 
+/**
+ * Reset game in progress by provided game id
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @returns {void}
+ */
 exports.resetGame = async (req, res) => {
 	const { gameId } = req.body;
 
