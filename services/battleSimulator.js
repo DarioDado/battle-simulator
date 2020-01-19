@@ -2,6 +2,7 @@ const events = require('events');
 const Game = require('../models/game');
 const config = require('../config');
 const LoggingService = require('./loggingService');
+const Common = require('../util/common');
 
 const eventEmitter = new events.EventEmitter();
 
@@ -160,13 +161,13 @@ function selectArmyToAttack(game, invadingArmy, fileredArmies) {
 
 	switch (invadingArmy.attackStrategy) {
 	case 'random':
-		underAttackArmy = fileredArmies[getRandomInt(fileredArmies.length - 1, 0)];
+		underAttackArmy = fileredArmies[Common.getRandomInt(fileredArmies.length - 1, 0)];
 		break;
 	case 'weakest':
-		underAttackArmy = getMin(fileredArmies, 'units');
+		underAttackArmy = Common.getMin(fileredArmies, 'units');
 		break;
 	case 'strongest':
-		underAttackArmy = getMax(fileredArmies, 'units');
+		underAttackArmy = Common.getMax(fileredArmies, 'units');
 		break;
 	default:
 		break;
@@ -176,50 +177,13 @@ function selectArmyToAttack(game, invadingArmy, fileredArmies) {
 }
 
 /**
- * Return random number between min and max
- *
- * @param {Number} max
- * @param {Number} min
- * @returns {Number}
- */
-function getRandomInt(max, min) {
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * Compare array of objects on specific object property to get object with minimum value
- *
- * @param {Array} array
- * @param {String} attrib
- * @returns {Object}
- */
-function getMin(array, attrib) {
-	return (array.length && array.reduce((prev, curr) => { 
-		return prev[attrib] < curr[attrib] ? prev : curr;
-	})) || null;
-}
-
-/**
- * Compare array of objects on specific object property to get object with maximum value
- *
- * @param {Array} array
- * @param {String} attrib
- * @returns {Object}
- */
-function getMax(array, attrib) {
-	return (array.length && array.reduce((prev, curr) => { 
-		return prev[attrib] > curr[attrib] ? prev : curr;
-	})) || null;
-}
-
-/**
  * Fetch attack success status based on army units
  *
  * @param {Number} units
  * @returns {Boolean}
  */
 function isAttackSuccessful(units) {
-	const randomNumber = getRandomInt(100, 1);
+	const randomNumber = Common.getRandomInt(100, 1);
 	return randomNumber < units;
 }
 
