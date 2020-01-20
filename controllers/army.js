@@ -4,6 +4,22 @@ const Game = require('../models/game');
 exports.addArmy = async (req, res) => {
 	const { name, units, attackStrategy } = req.body;
 
+	if (units < 80 || units > 100) {
+		return res.status(400).json({
+			data: {
+				message: 'Units need to be between 80 and 100.',
+			},
+		});
+	}
+
+	if (typeof units !== 'number') {
+		return res.status(400).json({
+			data: {
+				message: 'Invalid units format.',
+			},
+		});
+	}
+
 	const army = new Army({ name, units, attackStrategy });
 
 	const createdArmy = await army.save();
