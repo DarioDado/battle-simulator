@@ -119,7 +119,19 @@ exports.resetGame = async (req, res) => {
 		});
 	}
 
-	const game = await Game.findById(gameId).populate('armies');
+	const game = await Game.findById(gameId)
+		.where('status')
+		.equals('inProgress')
+		.populate('armies');
+
+	if (!game) {
+		return res.status(400).json({
+			data: {
+				message: 'The requested game is not in progress.',
+			},
+		});
+	}
+	
 
 	BattleSimulator.resetGame(game);
 
